@@ -1,0 +1,729 @@
+{
+	"info": {
+		"_postman_id": "26466419-b383-424a-8ba1-4a7338368369",
+		"name": "API Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43985546",
+		"_collection_link": "https://bassamashraf-3061018.postman.co/workspace/Event-Management-System~a76e0bad-cdfd-4260-86e9-31137cad98d6/collection/43985546-26466419-b383-424a-8ba1-4a7338368369?action=share&source=collection_link&creator=43985546"
+	},
+	"item": [
+		{
+			"name": "User Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"  pm.test(\"Status is 201 Created\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"  });\r",
+							"\r",
+							"  pm.test(\"Response schema is correct\", function () {\r",
+							"    const schema = {\r",
+							"        type: \"object\",\r",
+							"        required: [\"isAdmin\", \"id\", \"username\", \"email\", \"password\", \"createdAt\", \"updatedAt\"],\r",
+							"        properties: {\r",
+							"            isAdmin: { type: \"boolean\" },\r",
+							"            id: { type: \"number\" },\r",
+							"            username: { type: \"string\" },\r",
+							"            email: { type: \"string\", format: \"email\" },\r",
+							"            password: { type: \"string\" },\r",
+							"            createdAt: { type: \"string\", format: \"date-time\" },\r",
+							"            updatedAt: { type: \"string\", format: \"date-time\" }\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"  });\r",
+							"} \r",
+							"\r",
+							"/*\r",
+							"    Bug found in file: \"routes/auth.js\"\r",
+							"\r",
+							"    Bug description: As file Backend API specification.pdf it's say when there is \"Email already exists\" \r",
+							"                    error we must to send 400 error with this message \"Email already exists\"\r",
+							"\r",
+							"    Bug effect: its lead to make API Register test in postman failed because the error is not 400\r",
+							"\r",
+							"    Before solution:\r",
+							"    res.status(500).send(\"Something went wrong!\")\r",
+							"\r",
+							"    After solution:\r",
+							"    res.status(400).send(\"Email already exists\")\r",
+							"*/\r",
+							"if (pm.response.code === 400) {\r",
+							"  pm.test(\"Status is 400 Bad Request\", () => {\r",
+							"    pm.response.to.have.status(400);\r",
+							"  });\r",
+							"\r",
+							"  pm.test(\"Duplicate email error is returned\", () => {\r",
+							"    const res = pm.response.json();\r",
+							"    pm.expect(res.error).to.eql(\"Email already exists.\");\r",
+							"  });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"mohamed\",\r\n  \"email\": \"mohamed@gmail.com\",\r\n  \"password\": \"Mohamed@Test_123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/auth/register",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"if (pm.response.code === 200)\r",
+							"{\r",
+							"  // Validate the status code for successful login (200 OK)\r",
+							"  pm.test(\"Status code is 200 OK\", function () {\r",
+							"      pm.response.to.have.status(200);\r",
+							"  });\r",
+							"\r",
+							"  // Validate the response structure\r",
+							"  pm.test(\"Response has token\", function () {\r",
+							"      pm.expect(response).to.have.property(\"token\");\r",
+							"  });\r",
+							"\r",
+							"  // Save the token as an environment variable for future use\r",
+							"  if (response.token) \r",
+							"  {\r",
+							"      pm.environment.set(\"BEARER_TOKEN\", response.token);\r",
+							"  }\r",
+							"\r",
+							"\r",
+							"}\r",
+							"\r",
+							"if (pm.response.code === 401)\r",
+							"{\r",
+							"  // Validate the status code for invalid credentials (401 Unauthorized)\r",
+							"  pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+							"      pm.response.to.have.status(401);\r",
+							"  });\r",
+							"\r",
+							"  // Validate the error message\r",
+							"  pm.test(\"Error message is correct\", function () {\r",
+							"      pm.expect(response).to.have.property(\"error\", \"Invalid credentials\");\r",
+							"  });\r",
+							"\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"admin\",\r\n  \"email\": \"admin@gmail.com\",\r\n  \"password\": \"admin123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/auth/login",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create an Event (Admin Only)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status is 201 Created\", function () {\r",
+							"    pm.expect(pm.response.code).to.eql(201);\r",
+							"});\r",
+							"\r",
+							"// Admin created event\r",
+							"if (pm.response.code === 201) \r",
+							"{\r",
+							"pm.test(\"Event created successfully\", function () {\r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.expect(jsonData).to.have.property(\"name\");\r",
+							"    pm.expect(jsonData).to.have.property(\"description\");\r",
+							"    pm.expect(jsonData).to.have.property(\"date\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Event schema is correct\", function () {\r",
+							"    const schema = {\r",
+							"        type: \"object\",\r",
+							"        required: [\"id\", \"name\", \"description\", \"date\", \"createdAt\", \"updatedAt\"],\r",
+							"        properties: {\r",
+							"            id: { type: \"number\" },\r",
+							"            name: { type: \"string\" },\r",
+							"            description: { type: \"string\" },\r",
+							"            date: { type: \"string\", format: \"date-time\" },\r",
+							"            createdAt: { type: \"string\", format: \"date-time\" },\r",
+							"            updatedAt: { type: \"string\", format: \"date-time\" }\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"}\r",
+							"\r",
+							"// Not admin (403)\r",
+							"if (pm.response.code === 403) \r",
+							"{\r",
+							"    pm.test(\"Error message for non-admin\", () => {\r",
+							"        pm.expect(jsonData.error).to.eql(\"Invalid token.\");\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{BEARER_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Tech Conference\",\r\n  \"description\": \"A conference to showcase the latest technology trends.\",\r\n  \"date\": \"2024-12-20\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/events",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Events",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"// Check HTTP status\r",
+							"pm.test(\"Status is 200 OK\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Validate JSON Schema\r",
+							"pm.test(\"Each event object matches schema\", function () {\r",
+							"    const schema = {\r",
+							"        type: \"array\",\r",
+							"        items: {\r",
+							"            type: \"object\",\r",
+							"            required: [\"id\", \"name\", \"description\", \"date\", \"createdAt\", \"updatedAt\", \"rsvped\"],\r",
+							"            properties: {\r",
+							"                id: { type: \"number\" },\r",
+							"                name: { type: \"string\" },\r",
+							"                description: { type: \"string\" },\r",
+							"                date: { type: \"string\", format: \"date\" },\r",
+							"                createdAt: { type: \"string\", format: \"date-time\" },\r",
+							"                updatedAt: { type: \"string\", format: \"date-time\" },\r",
+							"                rsvped: { type: \"boolean\" }\r",
+							"            }\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{BEARER_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/events",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RSVP to an Event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"// General status check\r",
+							"pm.test(\"Status is 201 Created\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Successful RSVP\r",
+							"if (pm.response.code === 201) {\r",
+							"    pm.test(\"RSVP was successfully created\", function () {\r",
+							"        pm.expect(jsonData).to.have.property(\"id\");\r",
+							"        pm.expect(jsonData).to.have.property(\"user_id\");\r",
+							"        pm.expect(jsonData).to.have.property(\"event_id\");\r",
+							"        pm.expect(jsonData).to.have.property(\"createdAt\");\r",
+							"        pm.expect(jsonData).to.have.property(\"updatedAt\");\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"RSVP response schema is valid\", function () {\r",
+							"        const schema = {\r",
+							"            type: \"object\",\r",
+							"            required: [\"id\", \"user_id\", \"event_id\", \"createdAt\", \"updatedAt\"],\r",
+							"            properties: {\r",
+							"                id: { type: \"number\" },\r",
+							"                user_id: { type: \"number\" },\r",
+							"                event_id: { type: \"string\" },\r",
+							"                createdAt: { type: \"string\", format: \"date-time\" },\r",
+							"                updatedAt: { type: \"string\", format: \"date-time\" }\r",
+							"            }\r",
+							"        };\r",
+							"        pm.response.to.have.jsonSchema(schema);\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// If RSVP failed due to invalid event\r",
+							"if (pm.response.code === 404) {\r",
+							"    pm.test(\"Event not found error response\", function () {\r",
+							"        const schema = {\r",
+							"            type: \"object\",\r",
+							"            required: [\"error\"],\r",
+							"            properties: {\r",
+							"                error: { type: \"string\" }\r",
+							"            }\r",
+							"        };\r",
+							"        pm.response.to.have.jsonSchema(schema);\r",
+							"        pm.expect(jsonData.error).to.eql(\"Event not found.\");\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{BEARER_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/events/{{eventId}}/rsvps",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"events",
+						"{{eventId}}",
+						"rsvps"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get RSVPs for an Event (Admin Only)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// For successful retrieval\r",
+							"pm.test(\"Status code is 200 OK\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Response is an array of RSVPs\", function () {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.be.an('array');\r",
+							"    response.forEach(rsvp => {\r",
+							"        pm.expect(rsvp).to.have.property(\"userId\");\r",
+							"        pm.expect(rsvp).to.have.property(\"username\");\r",
+							"        pm.expect(rsvp).to.have.property(\"email\");\r",
+							"    });\r",
+							"});\r",
+							"pm.test(\"RSVP response schema is valid\", function () {\r",
+							"    const schema = {\r",
+							"        type: \"array\",\r",
+							"        items: {\r",
+							"            type: \"object\",\r",
+							"            required: [\"userId\", \"username\", \"email\"],\r",
+							"            properties: {\r",
+							"                userId: { type: \"number\" },\r",
+							"                username: { type: \"string\" },\r",
+							"                email: { type: \"string\", format: \"email\" }\r",
+							"            }\r",
+							"        }\r",
+							"    };\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"// For unauthorized access\r",
+							"pm.test(\"Status code is 403\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"pm.test(\"Error message is correct\", function () {\r",
+							"    const response = pm.response.json();\r",
+							"    pm.expect(response).to.have.property(\"error\", \"Admin access required.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{BEARER_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/events/{{eventId}}/rsvps",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"events",
+						"{{eventId}}",
+						"rsvps"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an Event (Admin Only)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// For successful deletion\r",
+							"\r",
+							"if (pm.response.code === 200)\r",
+							"{\r",
+							"    pm.test(\"Status code is 200\", function () {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    });\r",
+							"    pm.test(\"Response has correct deletion message\", function () {\r",
+							"        const response = pm.response.json();\r",
+							"        pm.expect(response).to.have.property(\"message\", \"Event deleted successfully.\");\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Delete response schema is valid\", function () {\r",
+							"    const schema = {\r",
+							"        type: \"object\",\r",
+							"        required: [\"message\"],\r",
+							"        properties: {\r",
+							"            message: { type: \"string\" }\r",
+							"        }\r",
+							"    };\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"if (pm.response.code === 404)\r",
+							"{\r",
+							"    // For event not found\r",
+							"    pm.test(\"Status code is 404\", function () {\r",
+							"        pm.response.to.have.status(404);\r",
+							"    });\r",
+							"    pm.test(\"Error message is correct\", function () {\r",
+							"        const response = pm.response.json();\r",
+							"        pm.expect(response).to.have.property(\"error\", \"Event not found.\");\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{BEARER_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URL}}/events/{{eventId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"events",
+						"{{eventId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response body\r",
+							"const response = pm.response.text();\r",
+							"\r",
+							"// Validate the status code for successful retrieval (200 OK)\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Validate the response structure\r",
+							"pm.test(\"Response has correct profile details\", function () {\r",
+							"    pm.expect(response).to.not.be.empty;\r",
+							"});\r",
+							"\r",
+							"/*\r",
+							"    Bug found in file: \"app.js\"\r",
+							"\r",
+							"    Bug description: the url is not correct we must to add \"/\" before api\r",
+							"\r",
+							"    Bug effect: its lead to make API Get User Profile test in postman failed because the url is not correct\r",
+							"\r",
+							"    Before solution:\r",
+							"    app.get('api/users/profile', async (req, res) => {\r",
+							"\r",
+							"    After solution:\r",
+							"    app.get('/api/users/profile', async (req, res) => {\r",
+							"\r",
+							"    by this solution we can get the user profile on postman\r",
+							"*/\r",
+							"// Validate the response schema\r",
+							"pm.test(\"Profile response schema is valid\", function () {\r",
+							"    pm.expect(response).to.include(\"id\");\r",
+							"    pm.expect(response).to.include(\"username\");\r",
+							"    pm.expect(response).to.include(\"email\");\r",
+							"    pm.expect(response).to.include(\"isAdmin\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{BEARER_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/users/profile",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

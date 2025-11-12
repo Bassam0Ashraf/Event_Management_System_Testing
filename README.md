@@ -323,8 +323,8 @@ Event-Management-System-Testing/
 ## Documentation
 
 ### Test Reports
-- [Test Cases Report](Reports/Event_Management_System_Test_Case_Report.pdf) - Comprehensive documentation of all 19 test cases with execution details
-- [Bug Report](Reports/Event_Management_System_Bug_Report_Full.pdf) - Detailed analysis of 3 backend bugs with root cause and fixes
+- [Test Cases Report](5-Reports/Event_Management_System_Test_Case_Report.pdf) - Comprehensive documentation of all 19 test cases with execution details
+- [Bug Report](5-Reports/Event_Management_System_Bug_Report_Full.pdf) - Detailed analysis of 3 backend bugs with root cause and fixes
 
 ## Key Learning Outcomes
 

@@ -14,6 +14,7 @@ A full-stack web application testing project demonstrating modern testing practi
 - [Bugs Found & Fixed](#bugs-found--fixed)
 - [Performance Analysis](#performance-analysis)
 - [Project Structure](#project-structure)
+- [Test Reports](#test-Reports)
 - [Key Learning Outcomes](#key-learning-outcomes)
 
 ## Project Overview
@@ -319,6 +320,12 @@ Event-Management-System-Testing/
 └── README.md
 ```
 
+## Documentation
+
+### Test Reports
+- [Test Cases Report](Reports/Event_Management_System_Test_Case_Report.pdf) - Comprehensive documentation of all 19 test cases with execution details
+- [Bug Report](Reports/Event_Management_System_Bug_Report_Full.pdf) - Detailed analysis of 3 backend bugs with root cause and fixes
+
 ## Key Learning Outcomes
 
 ### Technical Skills Demonstrated
@@ -360,13 +367,9 @@ This project serves as a comprehensive testing portfolio demonstrating professio
 
 ---
 
-## License
-
-This is an educational testing project for the EDGES Training Program.
-
----
-
 **Developed by:** Bassam Ashraf  
 **Testing Focus:** Full-Stack Web Application  
 **Tools Used:** Postman, Selenium, JMeter, Mocha, MariaDB  
 **Duration:** Complete testing lifecycle implementation
+
+**Contact:** For questions about testing methodologies or project details, please refer to the comprehensive documentation provided in the project files.
